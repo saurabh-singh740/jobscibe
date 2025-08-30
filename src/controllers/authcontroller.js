@@ -1,5 +1,5 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+const User = require("../models/user.model");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // Helper to generate JWT
@@ -13,8 +13,10 @@ const generateToken = (user) => {
 
 // Register
 const registerUser = async (req, res) => {
+  console.log(req.body);
+  
   try {
-    const { username, email, password } = req.body;
+    const { name, email, password } = req.body;
 
     // Check existing user
     if (await User.findOne({ email })) {
@@ -26,20 +28,23 @@ const registerUser = async (req, res) => {
 
     // Save user
     const user = await User.create({
-      username,
+      name,   // ✅ schema field sahi match ho gaya
       email,
       password: hashedPassword,
     });
+    const token=jwt.sign({id:user._id},process.env.JWT_SECRET)
+    res.cookie("token",token)
 
     res.status(201).json({
       message: "User registered successfully",
-      user: { id: user._id, username: user.username, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (error) {
     console.error("Register Error:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 
 // Login
 const loginUser = async (req, res) => {
@@ -54,6 +59,10 @@ const loginUser = async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword)
       return res.status(400).json({ message: "Invalid Credentials" });
+
+
+    const token=jwt.sign({id:user._id},process.env.JWT_SECRET)
+    res.cookie("token",token)
 
     // Send response
     res.status(200).json({
