@@ -5,18 +5,18 @@ const imagekit = require("../utils/imagekit");
 const uploadResume = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      return res.status(400).json({ success: false, message: "No file uploaded" });
     }
 
-    // ImageKit me upload karna
+    // Upload to ImageKit
     const uploadResponse = await imagekit.upload({
-      file: req.file.buffer, // multer memoryStorage se buffer milega
+      file: req.file.buffer,
       fileName: `${Date.now()}_${req.file.originalname}`,
     });
 
-    // Database me save karna
+    // Save to DB
     const resume = new Resume({
-      user: req.user.id, // ✅ JWT payload me "id" hai
+      user: req.user.id,
       fileUrl: uploadResponse.url,
       fileId: uploadResponse.fileId,
       originalName: req.file.originalname,
@@ -25,12 +25,13 @@ const uploadResume = async (req, res) => {
     await resume.save();
 
     res.status(201).json({
+      success: true,
       message: "Resume uploaded successfully",
-      resume,
+      data: resume,
     });
   } catch (error) {
     console.error("Error uploading resume:", error.response?.body || error.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -38,10 +39,10 @@ const uploadResume = async (req, res) => {
 const getUserResumes = async (req, res) => {
   try {
     const resumes = await Resume.find({ user: req.user.id }).sort({ createdAt: -1 });
-    res.status(200).json(resumes);
+    res.status(200).json({ success: true, data: resumes });
   } catch (error) {
     console.error("Error fetching resumes:", error.response?.body || error.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -51,22 +52,30 @@ const deleteResume = async (req, res) => {
     const resume = await Resume.findById(req.params.id);
 
     if (!resume) {
-      return res.status(404).json({ message: "Resume not found" });
+      return res.status(404).json({ success: false, message: "Resume not found" });
     }
 
-    if (resume.user.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Unauthorized" });
+    if (resume.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
-    // ImageKit se delete karna
-    await imagekit.deleteFile(resume.fileId);
+    // Delete from ImageKit first
+    if (resume.fileId) {
+      try {
+        await imagekit.deleteFile(resume.fileId);
+      } catch (ikError) {
+        console.error("Failed to delete from ImageKit:", ikError.response?.body || ikError.message);
+        return res.status(500).json({ success: false, message: "Failed to delete file from storage" });
+      }
+    }
 
+    // Delete from DB
     await Resume.deleteOne({ _id: resume._id });
 
-    res.status(200).json({ message: "Resume deleted successfully" });
+    res.status(200).json({ success: true, message: "Resume deleted successfully" });
   } catch (error) {
     console.error("Error deleting resume:", error.response?.body || error.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
