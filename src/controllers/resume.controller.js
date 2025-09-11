@@ -1,5 +1,6 @@
 const Resume = require("../models/resume.model");
 const imagekit = require("../utils/imagekit");
+const { parseResume } = require("../services/resumeParser"); // ✅ parser import
 
 // Upload Resume
 const uploadResume = async (req, res) => {
@@ -14,12 +15,21 @@ const uploadResume = async (req, res) => {
       fileName: `${Date.now()}_${req.file.originalname}`,
     });
 
+    // Try parsing the resume
+    let parsedData = {};
+    try {
+      parsedData = await parseResume(req.file.buffer); // ✅ structured parsing
+    } catch (parseError) {
+      console.warn("⚠️ Resume parsing failed:", parseError.message);
+    }
+
     // Save to DB
     const resume = new Resume({
       user: req.user.id,
       fileUrl: uploadResponse.url,
       fileId: uploadResponse.fileId,
       originalName: req.file.originalname,
+      parsedData, // ✅ store structured parsed info
     });
 
     await resume.save();

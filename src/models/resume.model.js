@@ -19,6 +19,19 @@ const resumeSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+
+    // 🔹 Parsed resume fields
+    parsedText: {
+      type: String, // Full extracted text
+    },
+    parsedData: {
+      name: { type: String },
+      email: { type: String },
+      phone: { type: String },
+      skills: [{ type: String }],
+      education: [{ type: String }],
+      experience: [{ type: String }],
+    },
   },
   { timestamps: true }
 );
