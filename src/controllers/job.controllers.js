@@ -1,4 +1,5 @@
 const Job = require("../models/job.model");
+const { fetchJobs } = require("../services/job.service"); // 🔥 external jobs service import
 
 // Add a job
 const addJob = async (req, res) => {
@@ -72,4 +73,28 @@ const deleteJob = async (req, res) => {
   }
 };
 
-module.exports = { addJob, getJobs, updateJobStatus, deleteJob };
+// ✅ Fetch external jobs
+const getExternalJobs = async (req, res) => {
+  try {
+    const { query = "", location = "remote" } = req.query;
+
+    const jobs = await fetchJobs(query, location);
+
+    res.status(200).json({
+      success: true,
+      count: jobs.length,
+      data: jobs,
+    });
+  } catch (error) {
+    console.error("Error fetching external jobs:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = {
+  addJob,
+  getJobs,
+  updateJobStatus,
+  deleteJob,
+  getExternalJobs, // 🔥 new export
+};

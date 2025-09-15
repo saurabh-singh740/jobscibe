@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { addJob, getJobs, updateJobStatus, deleteJob } = require("../controllers/job.controllers");
+const { addJob, getJobs, updateJobStatus, deleteJob, getExternalJobs } = require("../controllers/job.controllers");
 const authMiddleware = require("../middleware/authMiddleware");
 
 // Add job
@@ -14,5 +14,8 @@ router.put("/:id", authMiddleware, updateJobStatus);
 
 // Delete job
 router.delete("/:id", authMiddleware, deleteJob);
+
+// External job fetch
+router.get("/external",authMiddleware,getExternalJobs)
 
 module.exports = router;
