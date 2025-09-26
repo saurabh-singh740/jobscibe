@@ -37,7 +37,6 @@ const ResumeUpload = () => {
           withCredentials: true,
         }
       );
-      console.log(response.data);
 
       setResumeId(response.data?.data?._id || null);
       setParsedData(response.data?.data?.parsedData || null);
@@ -116,14 +115,26 @@ const ResumeUpload = () => {
               </div>
             </div>
           )}
+
+          {parsedData.projects && parsedData.projects.length > 0 && (
+            <div className="mb-1">
+              <span className="font-semibold">Projects:</span>
+              <ul className="list-disc list-inside mt-1 text-sm">
+                {parsedData.projects.map((proj, idx) => (
+                  <li key={idx}>{proj}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ✅ OptimiseResume me sirf resumeId aur parsedSkills pass ho rahe hain */}
+      {/* Pass parsedProjects to OptimiseResume */}
       {resumeId && parsedData?.skills?.length > 0 && (
         <OptimiseResume
           resumeId={resumeId}
           parsedSkills={parsedData.skills}
+          parsedProjects={parsedData.projects || []} // ✅ send projects too
         />
       )}
     </div>

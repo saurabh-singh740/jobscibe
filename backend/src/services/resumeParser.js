@@ -1,4 +1,3 @@
-// src/services/resumeParser.js
 const pdfParse = require("pdf-parse");
 
 // Utility: Extract email from text
@@ -7,13 +6,13 @@ function extractEmail(text) {
   return match ? match[0] : null;
 }
 
-// Utility: Extract phone numbers (10-15 digits, flexible format)
+// Utility: Extract phone numbers
 function extractPhone(text) {
   const match = text.match(/(\+?\d{1,3}[-.\s]?)?\d{10,15}/);
   return match ? match[0] : null;
 }
 
-// Utility: Extract LinkedIn / GitHub links
+// Utility: Extract links
 function extractLinks(text) {
   const links = [];
   const regex = /(https?:\/\/[^\s]+)/g;
@@ -24,7 +23,7 @@ function extractLinks(text) {
   return links;
 }
 
-// Utility: Extract skills (customizeable list)
+// Utility: Extract skills
 function extractSkills(text) {
   const skillsList = [
     "JavaScript", "React", "Node.js", "Express", "MongoDB",
@@ -32,13 +31,12 @@ function extractSkills(text) {
     "C++", "C#", "SQL", "MySQL", "PostgreSQL",
     "AWS", "Docker", "Kubernetes", "Git", "Machine Learning",
   ];
-
   return skillsList.filter(skill =>
     text.toLowerCase().includes(skill.toLowerCase())
   );
 }
 
-// Utility: Extract education info (basic version, regex-based)
+// Utility: Extract education info
 function extractEducation(text) {
   const eduKeywords = ["B.Tech", "B.E", "M.Tech", "MCA", "B.Sc", "M.Sc", "PhD", "Bachelor", "Master"];
   return eduKeywords.filter(edu =>
@@ -52,24 +50,47 @@ function extractExperience(text) {
   return match ? match[0] : null;
 }
 
-// Main Parser Function
+// Utility: Extract structured projects
+function extractProjects(text) {
+  const projects = [];
+  const projectSectionMatch = text.match(/(projects|personal projects|academic projects)\s*[:\n]/i);
+  
+  if (!projectSectionMatch) return projects;
+
+  const startIndex = projectSectionMatch.index + projectSectionMatch[0].length;
+  const remainingText = text.slice(startIndex);
+
+  const projectBlocks = remainingText.split(/\n{2,}/);
+
+  for (const block of projectBlocks) {
+    if (/experience|education|skills|certifications|achievements/i.test(block)) break;
+    if (!block.trim()) continue;
+
+    const lines = block.trim().split("\n");
+    const title = lines[0];
+    const description = lines.slice(1).join(" ");
+    projects.push({ title, description });
+  }
+
+  return projects;
+}
+
+// Main Parser
 async function parseResume(buffer) {
   try {
     const data = await pdfParse(buffer);
     const text = data.text;
 
-    // Extract structured data
-    const parsedData = {
-      rawText: text.trim(), // keep full text for reference
+    return {
+      rawText: text.trim(),
       email: extractEmail(text),
       phone: extractPhone(text),
       links: extractLinks(text),
       skills: extractSkills(text),
       education: extractEducation(text),
       experience: extractExperience(text),
+      projects: extractProjects(text),
     };
-
-    return parsedData;
   } catch (error) {
     console.error("❌ Error parsing resume:", error.message);
     throw new Error("Resume parsing failed. Please upload a valid PDF.");
