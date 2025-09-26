@@ -6,7 +6,6 @@ function safeParseJSON(raw) {
     throw new Error("AI returned empty response");
   }
 
-  // Trim & remove markdown fences like ```json ... ```
   let clean = raw.trim();
   if (clean.startsWith("```")) {
     clean = clean.replace(/```json/i, "").replace(/```/g, "").trim();
@@ -20,96 +19,62 @@ function safeParseJSON(raw) {
   }
 }
 
-// Resume optimisation
-async function optimizeResume(resumeText, jobDesc) {
+// Resume optimisation: structured, context-aware
+async function optimizeResume(parsedSkills, jobDesc, resumeText) {
+  const skills = Array.isArray(parsedSkills) ? parsedSkills : [];
+
   const prompt = `
-You are an advanced ATS Resume Optimization Engine. 
-Your role is to maximize job-resume alignment while keeping the resume natural, professional, and recruiter-friendly.
+You are an ATS Resume Optimization Engine.
 
 Inputs:
-Resume: {resumeText}
-Job Description: {jobDesc}
+- Resume Skills: ${JSON.stringify(skills)}
+- Job Description: "${jobDesc}"
+- Full Resume Text: "${resumeText || "No resume text provided"}"
 
-Tasks:
-1. **Deep Analysis**
-   - Extract key technical skills, tools, and keywords from the job description.
-   - Extract existing skills, tools, and keywords from the resume.
-   - Identify the overlap and the gaps.
+Rules:
+1. Rewrite the resume to highlight relevant skills, projects, and experience.
+2. Keep it professional, concise, and ATS-friendly.
+3. Suggest missing skills/keywords relevant to the role.
+4. Calculate ATS score (0-100) based on alignment.
+5. Return ONLY JSON in this structure:
 
-2. **Optimization**
-   - Rewrite the resume so it highlights **relevant skills** and **experiences** tailored to this specific job description.
-   - Ensure language is ATS-friendly (simple, keyword-rich, no graphics/irrelevant symbols).
-   - Add measurable **achievements** (e.g., "improved performance by 30%") where possible.
-   - Insert **missing keywords** naturally and in context without keyword stuffing.
-   - Do NOT add technologies or skills that are irrelevant to the job description.
-
-3. **ATS Scoring**
-   - Calculate an **ATS score (0–100)** based on keyword alignment, relevancy, and coverage.
-   - The scoring must be strict: 
-     - 90–100 = Excellent alignment
-     - 70–89 = Good alignment
-     - 50–69 = Moderate alignment
-     - Below 50 = Poor alignment
-
-4. **Suggestions**
-   - Provide actionable suggestions to further improve the resume (e.g., add metrics, clarify role impact, highlight leadership, emphasize domain knowledge).
-   - Keep suggestions clear, short, and directly useful.
-
-Output:
-Return ONLY valid JSON (no markdown, no explanations, no extra text). Structure:
 {
-  "optimizedResume": "...",
-  "atsScore": 85,
-  "suggestions": ["Add metrics to achievements", "Highlight leadership experience"],
-  "matchingKeywords": ["React", "JavaScript", "REST APIs"],
-  "missingKeywords": ["TypeScript", "Redux"]
+  "summary": "...",
+  "skills": ["..."],
+  "projects": ["..."],
+  "experience": ["..."],
+  "atsScore": 0,
+  "suggestions": ["..."]
 }
-
 `;
 
   const raw = await generateText(prompt);
   return safeParseJSON(raw);
 }
 
-// Resume ↔ Job keyword matching
-async function keywordMatch(resumeText, jobDesc) {
+// Resume ↔ Job keyword matching: context-aware
+async function keywordMatch(parsedSkills, jobDesc) {
+  const skills = Array.isArray(parsedSkills) ? parsedSkills : [];
+
   const prompt = `
-You are an advanced ATS Resume Matching Engine. 
-Your role is to measure alignment between a resume and a job description across all technology domains.
+You are an ATS Resume Matching Engine.
 
 Inputs:
-Resume: {resumeText}
-Job Description: {jobDesc}
+- Resume Skills: ${JSON.stringify(skills)}
+- Job Description: "${jobDesc}"
 
 Tasks:
-1. **Extract Keywords**
-   - From the Job Description: extract role-specific skills, tools, technologies, frameworks, certifications, and responsibilities.
-   - From the Resume: extract skills, tools, technologies, frameworks, and project details.
+1. Identify matching and missing keywords relevant to the role.
+2. Compute matchScore (0-100) based on skill alignment.
+3. Provide actionable suggestions.
+4. Return ONLY JSON:
 
-2. **Comparison**
-   - Identify **matchingKeywords** (explicitly present in both resume and JD).
-   - Identify **missingKeywords** (explicitly present in JD but not in resume).
-   - Missing keywords MUST be strictly relevant to the job description domain. Do not add unrelated technologies.
-
-3. **Match Score**
-   - Compute a match score (0–100) based on:
-     - Percentage of JD keywords present in resume.
-     - Importance of the keyword (core skills weigh more).
-   - Score should reflect realistic ATS matching standards.
-
-4. **Insights**
-   - Provide a short set of insights in JSON as suggestions:
-     - e.g., “Emphasize cloud experience”, “Add project metrics”, “Highlight security certifications”.
-
-Output:
-Return ONLY valid JSON (no markdown, no explanations, no extra text). Structure:
 {
-  "matchScore": 78,
-  "matchingKeywords": ["Python", "TensorFlow", "Data Pipelines"],
-  "missingKeywords": ["MLOps", "Kubernetes"],
-  "suggestions": ["Highlight experience with model deployment", "Add metrics for data processing speed"]
+  "matchScore": 0,
+  "matchingKeywords": ["..."],
+  "missingKeywords": ["..."],
+  "suggestions": ["..."]
 }
-
 `;
 
   const raw = await generateText(prompt);
@@ -117,4 +82,3 @@ Return ONLY valid JSON (no markdown, no explanations, no extra text). Structure:
 }
 
 module.exports = { optimizeResume, keywordMatch };
-

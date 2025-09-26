@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import OptimiseResume from "./Resume/OptimiseResume";
 
 const ResumeUpload = () => {
   const [file, setFile] = useState(null);
   const [parsedData, setParsedData] = useState(null);
+  const [resumeId, setResumeId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -11,6 +13,7 @@ const ResumeUpload = () => {
     setFile(e.target.files[0]);
     setParsedData(null);
     setError("");
+    setResumeId(null);
   };
 
   const handleUpload = async () => {
@@ -34,7 +37,9 @@ const ResumeUpload = () => {
           withCredentials: true,
         }
       );
+      console.log(response.data);
 
+      setResumeId(response.data?.data?._id || null);
       setParsedData(response.data?.data?.parsedData || null);
     } catch (err) {
       console.error(err);
@@ -48,10 +53,11 @@ const ResumeUpload = () => {
     setParsedData(null);
     setFile(null);
     setError("");
+    setResumeId(null);
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-6 space-y-6">
       {!parsedData && (
         <>
           <input
@@ -97,7 +103,9 @@ const ResumeUpload = () => {
                 {parsedData.skills.map((skill, index) => (
                   <a
                     key={index}
-                    href={`https://www.google.com/search?q=${encodeURIComponent(skill)}+jobs`}
+                    href={`https://www.google.com/search?q=${encodeURIComponent(
+                      skill
+                    )}+documentation`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-indigo-100 text-indigo-800 text-xs md:text-sm px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
@@ -108,23 +116,15 @@ const ResumeUpload = () => {
               </div>
             </div>
           )}
-          {parsedData.education && parsedData.education.length > 0 && (
-            <div className="mb-1">
-              <span className="font-semibold">Education:</span>
-              <ul className="list-disc list-inside text-sm md:text-base">
-                {parsedData.education.map((edu, index) => (
-                  <li key={index}>{edu}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {parsedData.experience && (
-            <p className="text-sm md:text-base">
-              <span className="font-semibold">Experience:</span>{" "}
-              {parsedData.experience}
-            </p>
-          )}
         </div>
+      )}
+
+      {/* ✅ OptimiseResume me sirf resumeId aur parsedSkills pass ho rahe hain */}
+      {resumeId && parsedData?.skills?.length > 0 && (
+        <OptimiseResume
+          resumeId={resumeId}
+          parsedSkills={parsedData.skills}
+        />
       )}
     </div>
   );
