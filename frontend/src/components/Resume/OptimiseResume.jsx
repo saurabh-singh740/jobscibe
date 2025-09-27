@@ -18,6 +18,8 @@ const OptimiseResume = ({ resumeId, parsedSkills, parsedProjects }) => {
       return;
     }
 
+    
+
     try {
       setLoading(true);
       setError("");

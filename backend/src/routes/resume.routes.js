@@ -5,26 +5,21 @@ const authMiddleware = require("../middleware/authMiddleware");
 const multer = require("multer");
 
 // Multer setup
-const storage = multer.memoryStorage(); // buffer me store
+const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
-  // PDF + DOC + DOCX
   const allowedTypes = [
     "application/pdf",
-    "application/msword", // .doc
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   ];
 
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only PDF or Word documents are allowed"), false);
-  }
+  if (allowedTypes.includes(file.mimetype)) cb(null, true);
+  else cb(new Error("Only PDF or Word documents are allowed"), false);
 };
 
-// Max file size 5MB
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter,
 });
 

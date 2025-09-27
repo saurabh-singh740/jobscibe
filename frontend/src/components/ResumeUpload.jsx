@@ -1,19 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
-import OptimiseResume from "./Resume/OptimiseResume";
 
 const ResumeUpload = () => {
   const [file, setFile] = useState(null);
-  const [parsedData, setParsedData] = useState(null);
-  const [resumeId, setResumeId] = useState(null);
+  const [parsedData, setParsedData] = useState({ skills: [], email: "", phone: "", links: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setParsedData(null);
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+    setParsedData({ skills: [], email: "", phone: "", links: [] });
     setError("");
-    setResumeId(null);
   };
 
   const handleUpload = async () => {
@@ -32,14 +30,16 @@ const ResumeUpload = () => {
       const response = await axios.post(
         "http://localhost:3000/api/resume/upload",
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        }
+        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
       );
 
-      setResumeId(response.data?.data?._id || null);
-      setParsedData(response.data?.data?.parsedData || null);
+      const data = response.data?.data?.parsedData;
+      setParsedData({
+        skills: Array.isArray(data.skills) ? data.skills : [],
+        email: data.email || "",
+        phone: data.phone || "",
+        links: Array.isArray(data.links) ? data.links : []
+      });
     } catch (err) {
       console.error(err);
       setError("Failed to upload resume. Try again.");
@@ -49,93 +49,64 @@ const ResumeUpload = () => {
   };
 
   const handleClear = () => {
-    setParsedData(null);
     setFile(null);
+    setParsedData({ skills: [], email: "", phone: "", links: [] });
     setError("");
-    setResumeId(null);
   };
 
   return (
-    <div className="mt-6 space-y-6">
-      {!parsedData && (
-        <>
+    <div className="max-w-3xl mx-auto mt-10 p-4 space-y-8">
+      {!parsedData.skills.length && (
+        <div className="space-y-3">
           <input
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={handleFileChange}
-            className="mb-2 w-full text-sm text-gray-700 border rounded-md p-2"
+            className="w-full text-sm border rounded-md p-2"
           />
           <button
             onClick={handleUpload}
-            className="w-full bg-indigo-600 text-white font-semibold py-2 rounded-md hover:bg-indigo-500 transition-colors mb-2"
+            disabled={loading}
+            className={`w-full py-2 rounded-md font-semibold ${loading ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-500 text-white"}`}
           >
             {loading ? "Uploading..." : "Upload & Parse"}
           </button>
-          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-        </>
-      )}
-
-      {parsedData && (
-        <div className="bg-gray-50 p-4 rounded-lg shadow-inner text-gray-800 relative">
-          <button
-            onClick={handleClear}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold text-lg"
-            title="Clear"
-          >
-            &times;
-          </button>
-
-          {parsedData.email && (
-            <p className="text-sm md:text-base mb-1">
-              <span className="font-semibold">Email:</span> {parsedData.email}
-            </p>
-          )}
-          {parsedData.phone && (
-            <p className="text-sm md:text-base mb-1">
-              <span className="font-semibold">Phone:</span> {parsedData.phone}
-            </p>
-          )}
-          {parsedData.skills && parsedData.skills.length > 0 && (
-            <div className="mb-1">
-              <span className="font-semibold">Skills:</span>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {parsedData.skills.map((skill, index) => (
-                  <a
-                    key={index}
-                    href={`https://www.google.com/search?q=${encodeURIComponent(
-                      skill
-                    )}+documentation`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-indigo-100 text-indigo-800 text-xs md:text-sm px-2 py-1 rounded-full hover:bg-indigo-200 transition-colors"
-                  >
-                    {skill}
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {parsedData.projects && parsedData.projects.length > 0 && (
-            <div className="mb-1">
-              <span className="font-semibold">Projects:</span>
-              <ul className="list-disc list-inside mt-1 text-sm">
-                {parsedData.projects.map((proj, idx) => (
-                  <li key={idx}>{proj}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
       )}
 
-      {/* Pass parsedProjects to OptimiseResume */}
-      {resumeId && parsedData?.skills?.length > 0 && (
-        <OptimiseResume
-          resumeId={resumeId}
-          parsedSkills={parsedData.skills}
-          parsedProjects={parsedData.projects || []} // ✅ send projects too
-        />
+      {parsedData.skills.length > 0 && (
+        <section className="bg-white shadow-md rounded-lg p-6 space-y-4">
+          <h2 className="text-xl font-bold text-gray-800">Skills</h2>
+          <div className="flex flex-wrap gap-2">
+            {parsedData.skills.map((skill, idx) => (
+              <span key={idx} className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-xs md:text-sm">
+                {skill}
+              </span>
+            ))}
+          </div>
+
+          {parsedData.email && (
+            <p><strong>Email:</strong> {parsedData.email}</p>
+          )}
+          {parsedData.phone && (
+            <p><strong>Phone:</strong> {parsedData.phone}</p>
+          )}
+          {parsedData.links.length > 0 && (
+            <p><strong>Links:</strong> {parsedData.links.join(", ")}</p>
+          )}
+        </section>
+      )}
+
+      {parsedData.skills.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleClear}
+            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-400 transition-colors"
+          >
+            Clear
+          </button>
+        </div>
       )}
     </div>
   );
