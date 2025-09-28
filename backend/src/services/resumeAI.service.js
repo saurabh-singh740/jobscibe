@@ -1,35 +1,52 @@
 const { generateText } = require("./ai.service");
 
-// Helper: safely parse AI JSON
+// ----------------- Helper: safely parse AI JSON -----------------
 function safeParseJSON(raw) {
-  if (!raw || typeof raw !== "string") throw new Error("AI returned empty response");
+  if (!raw || typeof raw !== "string")
+    throw new Error("AI returned empty response");
 
-  let clean = raw.trim();
-  if (clean.startsWith("```")) clean = clean.replace(/```json/i, "").replace(/```/g, "").trim();
+  // Remove triple backticks
+  let clean = raw
+    .replace(/```json/i, "")
+    .replace(/```/g, "")
+    .trim();
+
+  // Slice JSON only
+  const firstBrace = clean.indexOf("{");
+  const lastBrace = clean.lastIndexOf("}");
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+    console.error("AI returned malformed JSON:", raw);
+    throw new Error("Invalid AI JSON response");
+  }
+  clean = clean.slice(firstBrace, lastBrace + 1);
 
   try {
     return JSON.parse(clean);
   } catch (err) {
-    console.error("AI returned invalid JSON:", raw);
+    console.error("AI returned invalid JSON after cleaning:", clean);
     throw new Error("Invalid AI JSON response");
   }
 }
 
-// Resume optimization: includes projects
-async function optimizeResume(parsedSkills, parsedProjects, jobDesc, resumeText) {
+// ----------------- Resume Optimization -----------------
+async function optimizeResume(
+  parsedSkills,
+  parsedProjects,
+  jobDesc,
+  resumeText
+) {
   const skills = Array.isArray(parsedSkills) ? parsedSkills : [];
   const projects = Array.isArray(parsedProjects) ? parsedProjects : [];
 
+  // Extract role/domain dynamically from JD
+ const roleMatch = jobDesc ? jobDesc.match(/(frontend|backend|fullstack|mobile|qa|devops|data science|machine learning|ai|nlp|computer vision|cloud|security|cybersecurity|blockchain|web3|embedded|iot|game|ar|vr|metaverse|bi|analytics|database|sre|site reliability|robotics|automation|software|engineer|developer|designer)/i) : null;
+
+const role = roleMatch
+  ? roleMatch[0].charAt(0).toUpperCase() + roleMatch[0].slice(1)
+  : "Software Developer";
+
   const prompt = `
-You are an advanced ATS Resume Optimization Engine with deep knowledge of backend development hiring.
-
-Inputs:
-- Resume Skills: ${JSON.stringify(skills)}
-- Resume Projects: ${JSON.stringify(projects)}
-- Job Description: "${jobDesc}"
-- Full Resume Text: "${resumeText || "No resume text provided"}"
-
-You are an advanced ATS Resume Optimization Engine with deep knowledge of backend development hiring.
+You are an advanced ATS Resume Optimization Engine specialized in ${role} and all software/tech domains.
 
 Inputs:
 - Resume Skills: ${JSON.stringify(skills)}
@@ -38,54 +55,60 @@ Inputs:
 - Full Resume Text: "${resumeText || "No resume text provided"}"
 
 Tasks:
-1. Match resume skills with the job description semantically. Do not rely on exact string matches; consider synonyms, abbreviations, and related technologies.
-2. Evaluate each project for relevance to the JD and rank them by relevance. Provide a relevanceScore (0-100) for each.
-3. Identify missing skills or keywords important for this JD, including backend-specific technologies, frameworks, and tools.
-4. Suggest improvements for projects, e.g., emphasize tech stack, responsibilities, achievements, and impact.
+1. Match resume skills with the job description semantically, considering synonyms, abbreviations, and related technologies.
+2. Evaluate each project for relevance and rank by relevanceScore (0-100).
+3. Identify missing skills, keywords, and domain-specific technologies for the role.
+4. Suggest improvements for projects, emphasizing tech stack, responsibilities, achievements, and impact.
 5. Highlight top 3 projects and top 5 skills most relevant to the JD.
-6. Calculate an ATS alignment score (0-100) based on skills, projects, and keywords.
-7. Provide concise suggestions to improve ATS compatibility, including adding certifications, keywords, or backend-specific technologies.
-8. Keep all output professional, concise, and ATS-friendly.
-9. Return ONLY JSON in the following structure:
+6. Calculate ATS alignment score (0-100) based on skills, projects, and keywords.
+7. Provide concise actionable suggestions to improve ATS compatibility (certifications, tools, frameworks, domain-specific tech).
+8. Keep output professional, concise, and ATS-friendly.
+9. Return ONLY JSON in this structure:
 
 {
-  "summary": "...",                    // concise resume summary tailored for JD
-  "skills": ["..."],                   // optimized skills list
-  "projects": [                        // only relevant projects
+  "summary": "...",
+  "skills": ["..."],
+  "projects": [
     {
       "title": "...",
       "description": "...",
-      "relevanceScore": 0             // 0-100 relevance to JD
+      "relevanceScore": 0
     }
   ],
-  "experience": ["..."],               // optimized experience highlights
-  "topSkills": ["..."],                // top 5 skills most relevant
-  "topProjects": ["..."],              // titles of top 3 relevant projects
-  "missingSkills": ["..."],            // skills/keywords missing
-  "atsScore": 0,                        // 0-100
-  "suggestions": ["..."]               // actionable tips for ATS optimization
+  "experience": ["..."],
+  "topSkills": ["..."],
+  "topProjects": ["..."],
+  "missingSkills": ["..."],
+  "atsScore": 0,
+  "suggestions": ["..."]
 }
-
 `;
 
   const raw = await generateText(prompt);
   return safeParseJSON(raw);
 }
 
-
-// Resume ↔ Job keyword matching
+// ----------------- Resume ↔ Job Keyword Matching -----------------
 async function keywordMatch(parsedSkills, jobDesc) {
   const skills = Array.isArray(parsedSkills) ? parsedSkills : [];
 
+  // Extract role/domain dynamically
+  const roleMatch = jobDesc.match(
+    /(frontend|backend|fullstack|mobile|qa|devops|data science|machine learning|ai|nlp|computer vision|cloud|security|cybersecurity|blockchain|web3|embedded|iot|game|ar|vr|metaverse|bi|analytics|database|sre|site reliability|robotics|automation|software|engineer|developer|designer)/i
+  );
+  const role = roleMatch
+    ? roleMatch[0].charAt(0).toUpperCase() + roleMatch[0].slice(1)
+    : "Software Developer";
+
   const prompt = `
-You are an ATS Resume Matching Engine.
+You are an ATS Resume Matching Engine specialized in ${role} and all software/tech domains.
 
 Inputs:
 - Resume Skills: ${JSON.stringify(skills)}
 - Job Description: "${jobDesc}"
 
 Tasks:
-1. Identify matching and missing keywords relevant to the role.
+1. Identify matching and missing keywords relevant to this role/domain.
 2. Compute matchScore (0-100) based on skill alignment.
 3. Provide actionable suggestions.
 4. Return ONLY JSON:

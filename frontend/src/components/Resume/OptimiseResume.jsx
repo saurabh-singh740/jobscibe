@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const OptimiseResume = ({ resumeId, parsedSkills, parsedProjects }) => {
+const OptimiseResume = ({ resumeId, parsedSkills }) => { // parsedProjects hata diya
   const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,20 +18,15 @@ const OptimiseResume = ({ resumeId, parsedSkills, parsedProjects }) => {
       return;
     }
 
-    
-
     try {
       setLoading(true);
       setError("");
-
-      console.log("Submitting:", { jobDescription, parsedSkills, parsedProjects, resumeId });
 
       const response = await axios.post(
         "http://localhost:3000/api/ai/optimize",
         {
           resumeId,
           parsedSkills,
-          parsedProjects: parsedProjects || [], // ✅ send projects as well
           jobDescription,
         },
         {
@@ -40,18 +35,11 @@ const OptimiseResume = ({ resumeId, parsedSkills, parsedProjects }) => {
         }
       );
 
-      if (response.data) {
-        setResult(response.data);
-      } else {
-        setError("No data returned from backend.");
-      }
+      if (response.data) setResult(response.data);
+      else setError("No data returned from backend.");
     } catch (err) {
       console.error(err);
-      if (err.response && err.response.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Failed to optimise resume. Try again.");
-      }
+      setError(err.response?.data?.message || "Failed to optimise resume. Try again.");
     } finally {
       setLoading(false);
     }
@@ -97,43 +85,15 @@ const OptimiseResume = ({ resumeId, parsedSkills, parsedProjects }) => {
           <h3 className="font-semibold mb-2">Optimisation Result:</h3>
 
           <div className="space-y-2 text-xs md:text-sm">
-            {result.summary && (
-              <p>
-                <strong>Summary:</strong> {result.summary}
-              </p>
-            )}
-
-            {result.atsScore !== undefined && (
-              <p>
-                <strong>ATS Score:</strong> {result.atsScore}
-              </p>
-            )}
-
-            {result.topSkills && result.topSkills.length > 0 && (
-              <p>
-                <strong>Top Skills:</strong> {result.topSkills.join(", ")}
-              </p>
-            )}
-
-            {result.topProjects && result.topProjects.length > 0 && (
-              <p>
-                <strong>Top Projects:</strong> {result.topProjects.join(", ")}
-              </p>
-            )}
-
-            {result.missingSkills && result.missingSkills.length > 0 && (
-              <p>
-                <strong>Missing Skills:</strong> {result.missingSkills.join(", ")}
-              </p>
-            )}
-
+            {result.summary && <p><strong>Summary:</strong> {result.summary}</p>}
+            {result.atsScore !== undefined && <p><strong>ATS Score:</strong> {result.atsScore}</p>}
+            {result.topSkills && result.topSkills.length > 0 && <p><strong>Top Skills:</strong> {result.topSkills.join(", ")}</p>}
+            {result.missingSkills && result.missingSkills.length > 0 && <p><strong>Missing Skills:</strong> {result.missingSkills.join(", ")}</p>}
             {result.suggestions && result.suggestions.length > 0 && (
               <div>
                 <strong>Suggestions:</strong>
                 <ul className="list-disc list-inside">
-                  {result.suggestions.map((sugg, idx) => (
-                    <li key={idx}>{sugg}</li>
-                  ))}
+                  {result.suggestions.map((sugg, idx) => <li key={idx}>{sugg}</li>)}
                 </ul>
               </div>
             )}

@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const ResumeUpload = () => {
+const ResumeUpload = ({ setResumeId, setParsedSkills, setParsedText }) => {
   const [file, setFile] = useState(null);
-  const [parsedData, setParsedData] = useState({ skills: [], email: "", phone: "", links: [] });
+  const [parsedData, setParsedData] = useState({ skills: [], email: "", phone: "", links: [], text: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    setParsedData({ skills: [], email: "", phone: "", links: [] });
+    setParsedData({ skills: [], email: "", phone: "", links: [], text: "" });
     setError("");
+    setResumeId(null);
+    setParsedSkills([]);
+    setParsedText("");
   };
 
   const handleUpload = async () => {
@@ -34,12 +37,24 @@ const ResumeUpload = () => {
       );
 
       const data = response.data?.data?.parsedData;
+      const id = response.data?.data?._id;
+
+      const skills = Array.isArray(data.skills) ? data.skills : [];
+      const text = data.text || "";
+
       setParsedData({
-        skills: Array.isArray(data.skills) ? data.skills : [],
+        skills,
         email: data.email || "",
         phone: data.phone || "",
-        links: Array.isArray(data.links) ? data.links : []
+        links: Array.isArray(data.links) ? data.links : [],
+        text
       });
+
+      // Set parent state
+      setResumeId(id);
+      setParsedSkills(skills);
+      setParsedText(text);
+
     } catch (err) {
       console.error(err);
       setError("Failed to upload resume. Try again.");
@@ -50,8 +65,11 @@ const ResumeUpload = () => {
 
   const handleClear = () => {
     setFile(null);
-    setParsedData({ skills: [], email: "", phone: "", links: [] });
+    setParsedData({ skills: [], email: "", phone: "", links: [], text: "" });
     setError("");
+    setResumeId(null);
+    setParsedSkills([]);
+    setParsedText("");
   };
 
   return (
@@ -86,15 +104,9 @@ const ResumeUpload = () => {
             ))}
           </div>
 
-          {parsedData.email && (
-            <p><strong>Email:</strong> {parsedData.email}</p>
-          )}
-          {parsedData.phone && (
-            <p><strong>Phone:</strong> {parsedData.phone}</p>
-          )}
-          {parsedData.links.length > 0 && (
-            <p><strong>Links:</strong> {parsedData.links.join(", ")}</p>
-          )}
+          {parsedData.email && <p><strong>Email:</strong> {parsedData.email}</p>}
+          {parsedData.phone && <p><strong>Phone:</strong> {parsedData.phone}</p>}
+          {parsedData.links.length > 0 && <p><strong>Links:</strong> {parsedData.links.join(", ")}</p>}
         </section>
       )}
 
