@@ -7,7 +7,7 @@ const Features = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [resumeId, setResumeId] = useState(null);
   const [parsedSkills, setParsedSkills] = useState([]);
-  const [parsedText, setParsedText] = useState("");
+  const [parsedText, setParsedText] = useState(""); // raw JD or resume text
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -18,17 +18,33 @@ const Features = () => {
     {
       title: "Resume Parsing",
       description: "Instantly extract key details from your CV to make it recruiter-ready.",
-      component: <ResumeUpload setResumeId={setResumeId} setParsedSkills={setParsedSkills} setParsedText={setParsedText} />,
+      component: (
+        <ResumeUpload
+          setResumeId={setResumeId}
+          setParsedSkills={setParsedSkills}
+          setParsedText={setParsedText}
+        />
+      ),
     },
     {
       title: "Optimise Resume",
       description: "Enhance your resume by identifying strengths and gaps for better alignment with job requirements.",
-      component: <OptimiseResume resumeId={resumeId} parsedSkills={parsedSkills} />,
+      component: (
+        <OptimiseResume
+          resumeId={resumeId}
+          parsedSkills={parsedSkills}
+        />
+      ),
     },
     {
       title: "Keyword Matching",
       description: "Check how well your resume content matches with job description keywords to boost shortlisting chances.",
-      component: <KeywordMatch parsedSkills={parsedSkills} parsedText={parsedText} />,
+      component: (
+        <KeywordMatch
+          parsedSkills={parsedSkills}
+          parsedText={parsedText} // yahi se JD pass hoga
+        />
+      ),
     },
     {
       title: "Job Search",

@@ -1,47 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-const KeywordMatch = ({ parsedSkills = [], parsedText = "" }) => {
-  const [jobDescription, setJobDescription] = useState(parsedText || ""); // default from resume
+const KeywordMatch = ({ parsedSkills = [] }) => {
+  const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
-    if (!jobDescription.trim()) return setError("Please enter a job description.");
+    if (!jobDescription.trim())
+      return setError("Please enter a job description.");
 
     try {
       setLoading(true);
       setError("");
       const response = await axios.post(
         "http://localhost:3000/api/ai/match",
-        { parsedSkills, jobDescription }, // backend expects these two
+        { parsedSkills, jobDescription }, // sirf ye do hi bhejenge
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
+
       if (response.data) setResult(response.data);
       else setError("No data returned from backend.");
     } catch (err) {
       console.error(err.response?.data || err);
-      setError(err.response?.data?.error || "Failed to match keywords. Try again.");
+      setError(
+        err.response?.data?.error || "Failed to match keywords. Try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleClear = () => {
-    setJobDescription(parsedText || "");
+    setJobDescription("");
     setResult(null);
     setError("");
   };
 
-  // update jobDescription if parsedText changes
-  useEffect(() => {
-    if (parsedText) setJobDescription(parsedText);
-  }, [parsedText]);
-
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mt-6 max-w-md mx-auto">
-      <h2 className="text-lg font-semibold mb-3 text-gray-800 text-center">Keyword Match</h2>
+      <h2 className="text-lg font-semibold mb-3 text-gray-800 text-center">
+        Keyword Match
+      </h2>
 
       <textarea
         value={jobDescription}
@@ -64,17 +65,39 @@ const KeywordMatch = ({ parsedSkills = [], parsedText = "" }) => {
 
       {result && (
         <div className="bg-gray-50 p-3 rounded-lg shadow-inner text-sm text-gray-800 relative mt-4">
-          <button onClick={handleClear} className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold text-lg" title="Clear">&times;</button>
+          <button
+            onClick={handleClear}
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold text-lg"
+            title="Clear"
+          >
+            &times;
+          </button>
 
           <div className="space-y-2 text-xs md:text-sm">
-            {result.matchScore !== undefined && <p><strong>Match Score:</strong> {result.matchScore}</p>}
-            {result.matchingKeywords?.length > 0 && <p><strong>Matching Keywords:</strong> {result.matchingKeywords.join(", ")}</p>}
-            {result.missingKeywords?.length > 0 && <p><strong>Missing Keywords:</strong> {result.missingKeywords.join(", ")}</p>}
+            {result.matchScore !== undefined && (
+              <p>
+                <strong>Match Score:</strong> {result.matchScore}
+              </p>
+            )}
+            {result.matchingKeywords?.length > 0 && (
+              <p>
+                <strong>Matching Keywords:</strong>{" "}
+                {result.matchingKeywords.join(", ")}
+              </p>
+            )}
+            {result.missingKeywords?.length > 0 && (
+              <p>
+                <strong>Missing Keywords:</strong>{" "}
+                {result.missingKeywords.join(", ")}
+              </p>
+            )}
             {result.suggestions?.length > 0 && (
               <div>
                 <strong>Suggestions:</strong>
                 <ul className="list-disc list-inside">
-                  {result.suggestions.map((s, idx) => <li key={idx}>{s}</li>)}
+                  {result.suggestions.map((s, idx) => (
+                    <li key={idx}>{s}</li>
+                  ))}
                 </ul>
               </div>
             )}
