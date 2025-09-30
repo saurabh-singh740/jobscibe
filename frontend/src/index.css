@@ -1,1 +1,54 @@
 @import "tailwindcss";
+@keyframes float {
+  0%, 100% { transform: translateY(0px) }
+  50% { transform: translateY(-20px) }
+}
+
+@keyframes float-reverse {
+  0%, 100% { transform: translateY(0px) }
+  50% { transform: translateY(20px) }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) }
+  50% { transform: translateY(-10px) }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(30px) }
+  100% { opacity: 1; transform: translateY(0) }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-reverse { animation: float-reverse 8s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 10s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 1s ease-out forwards; }
+
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  animation: gradientMove 12s ease infinite;
+}
+@layer utilities {
+  .animate-bounce-slow {
+    animation: bounce-slow 10s infinite alternate;
+  }
+  .animate-bounce-slow-reverse {
+    animation: bounce-slow-reverse 12s infinite alternate;
+  }
+  @keyframes bounce-slow {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(30px) scale(1.1); }
+    100% { transform: translateY(0) scale(1); }
+  }
+  @keyframes bounce-slow-reverse {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.1); }
+    100% { transform: translateY(0) scale(1); }
+  }
+}

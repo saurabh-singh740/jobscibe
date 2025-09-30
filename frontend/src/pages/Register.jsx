@@ -45,7 +45,7 @@ function Register() {
       if (res.status === 201 || res.status === 200) {
         setSuccess("Account created successfully! Redirecting...");
         setFormData({ name: "", email: "", password: "", confirmPassword: "" });
-        setTimeout(() => navigate("/"), 1000);
+        setTimeout(() => navigate("/login"), 1500);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -55,16 +55,22 @@ function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-indigo-100 via-white to-indigo-50 px-4">
-      <div className="w-full max-w-md bg-white backdrop-blur-md shadow-2xl rounded-3xl p-8 sm:p-10 transition-transform transform hover:scale-105 duration-500">
-        <h2 className="text-center text-3xl font-extrabold text-indigo-700 mb-6 animate-pulse">
+    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 overflow-hidden px-4">
+      {/* 🔥 Animated gradient blobs in background */}
+      <div className="absolute -top-20 -left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float-slow"></div>
+      <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float-reverse"></div>
+
+      {/* 🔥 Animated Register card */}
+      <div className="w-full max-w-md bg-white shadow-2xl rounded-3xl p-8 sm:p-10 relative z-10 transform transition-all duration-700 ease-out animate-fade-in-up">
+        <h2 className="text-center text-3xl font-extrabold text-purple-700 mb-6">
           Create Your Jobscribe Account
         </h2>
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Full Name */}
           <div className="relative">
-            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-indigo-600">
+            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-purple-600">
               Full Name
             </label>
             <input
@@ -73,14 +79,14 @@ function Register() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 placeholder-gray-400 focus:border-indigo-500 focus:ring focus:ring-indigo-100 focus:ring-opacity-50 transition"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-purple-400 outline-none transition"
               placeholder="John Doe"
             />
           </div>
 
           {/* Email */}
           <div className="relative">
-            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-indigo-600">
+            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-purple-600">
               Email
             </label>
             <input
@@ -89,14 +95,14 @@ function Register() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 placeholder-gray-400 focus:border-indigo-500 focus:ring focus:ring-indigo-100 focus:ring-opacity-50 transition"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-purple-400 outline-none transition"
               placeholder="your@email.com"
             />
           </div>
 
           {/* Password */}
           <div className="relative">
-            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-indigo-600">
+            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-purple-600">
               Password
             </label>
             <input
@@ -106,14 +112,14 @@ function Register() {
               onChange={handleChange}
               required
               minLength="6"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 placeholder-gray-400 focus:border-indigo-500 focus:ring focus:ring-indigo-100 focus:ring-opacity-50 transition"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-purple-400 outline-none transition"
               placeholder="••••••••"
             />
           </div>
 
           {/* Confirm Password */}
           <div className="relative">
-            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-indigo-600">
+            <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-purple-600">
               Confirm Password
             </label>
             <input
@@ -123,14 +129,14 @@ function Register() {
               onChange={handleChange}
               required
               minLength="6"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 placeholder-gray-400 focus:border-indigo-500 focus:ring focus:ring-indigo-100 focus:ring-opacity-50 transition"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-purple-400 outline-none transition"
               placeholder="••••••••"
             />
           </div>
 
           {/* Error/Success messages */}
           {error && (
-            <p className="text-sm text-red-600 bg-red-100 p-2 rounded-md animate-shake">
+            <p className="text-sm text-red-600 bg-red-100 p-2 rounded-md animate-pulse">
               {error}
             </p>
           )}
@@ -144,7 +150,7 @@ function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 transform hover:scale-105"
+            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105"
           >
             {loading ? "Registering..." : "Register"}
           </button>
@@ -152,7 +158,10 @@ function Register() {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 font-medium hover:underline">
+          <Link
+            to="/login"
+            className="text-purple-600 font-medium hover:underline"
+          >
             Login
           </Link>
         </p>

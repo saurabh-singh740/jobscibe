@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const OptimiseResume = ({ resumeId, parsedSkills }) => { // parsedProjects hata diya
+const OptimiseResume = ({ resumeId, parsedSkills }) => {
   const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,15 +24,8 @@ const OptimiseResume = ({ resumeId, parsedSkills }) => { // parsedProjects hata 
 
       const response = await axios.post(
         "http://localhost:3000/api/ai/optimize",
-        {
-          resumeId,
-          parsedSkills,
-          jobDescription,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        { resumeId, parsedSkills, jobDescription },
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
 
       if (response.data) setResult(response.data);
@@ -52,29 +45,27 @@ const OptimiseResume = ({ resumeId, parsedSkills }) => { // parsedProjects hata 
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mt-6">
-      <h2 className="text-lg font-semibold mb-3 text-gray-800">
-        Optimise Resume
-      </h2>
+    <div
+      className="p-6 bg-gradient-to-br from-white/90 via-indigo-100/80 to-purple-100/80 backdrop-blur-md rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 flex flex-col w-full"
+      style={{ minHeight: "350px", maxHeight: "450px" }}
+    >
+      <h2 className="text-lg font-semibold mb-3 text-indigo-900">Optimise Resume</h2>
 
+      {/* Textarea */}
       <textarea
         value={jobDescription}
         onChange={(e) => setJobDescription(e.target.value)}
         placeholder="Paste job description here..."
-        className="w-full h-28 p-2 border rounded-md mb-3 text-sm text-gray-700"
+        className="w-full h-24 p-3 mb-3 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
       />
-
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-indigo-600 text-white font-semibold py-2 rounded-md hover:bg-indigo-500 transition-colors mb-2"
-      >
-        {loading ? "Optimising..." : "Optimise"}
-      </button>
 
       {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
+      {/* Result area */}
       {result && (
-        <div className="bg-gray-50 p-3 rounded-lg shadow-inner text-sm text-gray-800 relative">
+        <div
+          className="p-3 rounded-lg shadow-inner text-sm text-gray-800 relative flex-1 overflow-hidden"
+        >
           <button
             onClick={handleClear}
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold text-lg"
@@ -82,14 +73,14 @@ const OptimiseResume = ({ resumeId, parsedSkills }) => { // parsedProjects hata 
           >
             &times;
           </button>
-          <h3 className="font-semibold mb-2">Optimisation Result:</h3>
 
+          <h3 className="font-semibold mb-2 text-indigo-700">Optimisation Result:</h3>
           <div className="space-y-2 text-xs md:text-sm">
             {result.summary && <p><strong>Summary:</strong> {result.summary}</p>}
             {result.atsScore !== undefined && <p><strong>ATS Score:</strong> {result.atsScore}</p>}
-            {result.topSkills && result.topSkills.length > 0 && <p><strong>Top Skills:</strong> {result.topSkills.join(", ")}</p>}
-            {result.missingSkills && result.missingSkills.length > 0 && <p><strong>Missing Skills:</strong> {result.missingSkills.join(", ")}</p>}
-            {result.suggestions && result.suggestions.length > 0 && (
+            {result.topSkills?.length > 0 && <p><strong>Top Skills:</strong> {result.topSkills.join(", ")}</p>}
+            {result.missingSkills?.length > 0 && <p><strong>Missing Skills:</strong> {result.missingSkills.join(", ")}</p>}
+            {result.suggestions?.length > 0 && (
               <div>
                 <strong>Suggestions:</strong>
                 <ul className="list-disc list-inside">
@@ -100,6 +91,16 @@ const OptimiseResume = ({ resumeId, parsedSkills }) => { // parsedProjects hata 
           </div>
         </div>
       )}
+
+      {/* Optimise Button fixed at bottom */}
+      <div className="mt-3">
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-indigo-600 text-white font-semibold py-2 rounded-md hover:bg-indigo-500 transition-colors"
+        >
+          {loading ? "Optimising..." : "Optimise"}
+        </button>
+      </div>
     </div>
   );
 };
