@@ -40,8 +40,8 @@ const KeywordMatch = ({ parsedSkills = [] }) => {
 
   return (
     <div
-  className="p-6 bg-gradient-to-br from-white/90 via-indigo-100/80 to-purple-100/80 backdrop-blur-md rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 flex flex-col w-full"
-  style={{ minHeight: "350px", maxHeight: "450px" }}
+  className="p-6 bg-indigo-100/80 backdrop-blur-md rounded-2xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 flex flex-col"
+  style={{ minHeight: "350px", maxHeight: "650px" }}
 >
   <h2 className="text-lg font-semibold mb-3 text-indigo-900 text-center">Keyword Match</h2>
 

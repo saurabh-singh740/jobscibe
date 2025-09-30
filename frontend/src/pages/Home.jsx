@@ -125,6 +125,39 @@ const Home = () => {
           </div>
         </section>
 
+        {/* About Section */}
+        <section className="py-20 bg-gradient-to-b from-white/20 via-white/40 to-white/20 backdrop-blur-lg">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-purple-800 mb-8">
+              About Jobscribe
+            </h2>
+            <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+              Jobscribe was built with one mission: to simplify the job search process.
+              From parsing your resume to optimizing it for ATS and matching it with
+              real-world job postings, we aim to empower job seekers with tools that
+              actually work.
+            </p>
+
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { title: "Founded", desc: "Jobscribe was launched in 2025 with a vision to help millions of graduates & professionals." },
+                { title: "Our Values", desc: "Simplicity, innovation, and accessibility are at the core of everything we build." },
+                { title: "The Future", desc: "We’re building smarter AI-driven tools to redefine career growth globally." },
+              ].map((info, i) => (
+                <div
+                  key={i}
+                  className="p-6 bg-white/70 rounded-2xl shadow-md hover:shadow-lg transition"
+                >
+                  <h3 className="text-xl font-semibold text-purple-700 mb-2">
+                    {info.title}
+                  </h3>
+                  <p className="text-gray-600">{info.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-20 text-center">
           <h2 className="text-3xl font-bold text-white mb-6">

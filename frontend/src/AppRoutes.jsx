@@ -1,10 +1,12 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Layout/Navbar.jsx"; // ✅ lowercase 'layout'
+import Navbar from "./components/Layout/Navbar.jsx"; // Navbar component
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
-import Features from "./pages/feature.jsx"; // ✅ file ka naam capital hona chahiye
+import Features from "./pages/feature.jsx";
+import About from "./components/AboutPage.jsx";
+import ContentPage from "./components/ContactPage.jsx"; // Contact / Content page
 
 function AppRoutes() {
   return (
@@ -12,14 +14,15 @@ function AppRoutes() {
       {/* Navbar har page pe visible */}
       <Navbar />
       <div className="pt-20">
-
-      {/* Routes */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/features" element={<Features />} /> {/* ✅ Features route */}
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+        {/* Routes */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<ContentPage />} /> {/* Correct element */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
       </div>
     </BrowserRouter>
   );

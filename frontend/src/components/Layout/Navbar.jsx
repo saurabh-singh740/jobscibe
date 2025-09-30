@@ -1,8 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation(); // current route path
+
+  const links = [
+    { name: "Home", path: "/" },
+    { name: "Features", path: "/features" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
+    { name: "Login", path: "/login" },
+    { name: "Register", path: "/register" },
+  ];
 
   return (
     <nav className="w-full bg-white shadow-md fixed top-0 left-0 z-50">
@@ -14,18 +24,17 @@ function Navbar() {
 
         {/* Desktop Links */}
         <div className="space-x-6 hidden md:flex">
-          <Link to="/" className="text-gray-700 hover:text-indigo-600">
-            Home
-          </Link>
-          <Link to="/features" className="text-gray-700 hover:text-indigo-600">
-            Features
-          </Link>
-          <Link to="/login" className="text-gray-700 hover:text-indigo-600">
-            Login
-          </Link>
-          <Link to="/register" className="text-gray-700 hover:text-indigo-600">
-            Register
-          </Link>
+          {links.map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`text-gray-700 hover:text-indigo-600 transition ${
+                location.pathname === link.path ? "font-semibold text-indigo-600" : ""
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
 
         {/* Mobile Menu Button */}
@@ -42,34 +51,18 @@ function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white shadow-md">
-          <Link
-            to="/"
-            className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
-            onClick={() => setIsOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            to="/features"
-            className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
-            onClick={() => setIsOpen(false)}
-          >
-            Features
-          </Link>
-          <Link
-            to="/login"
-            className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
-            onClick={() => setIsOpen(false)}
-          >
-            Login
-          </Link>
-          <Link
-            to="/register"
-            className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
-            onClick={() => setIsOpen(false)}
-          >
-            Register
-          </Link>
+          {links.map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              onClick={() => setIsOpen(false)}
+              className={`block px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition ${
+                location.pathname === link.path ? "font-semibold text-indigo-600 bg-indigo-50" : ""
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
       )}
     </nav>

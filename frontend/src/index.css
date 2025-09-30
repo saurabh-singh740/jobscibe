@@ -52,3 +52,28 @@
     100% { transform: translateY(0) scale(1); }
   }
 }
+@keyframes slide-in {
+  0% { opacity: 0; transform: translateX(-50px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.8s forwards;
+}
+
+@keyframes line-grow {
+  0% { transform: scaleY(0); }
+  100% { transform: scaleY(1); }
+}
+
+.animate-line-grow {
+  animation: line-grow 1s forwards;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
