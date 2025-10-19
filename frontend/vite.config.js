@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // backend server ka port
+        target: 'https://jobscibe.onrender.com/', // backend server ka port
         changeOrigin: true,
         secure: false,
       },

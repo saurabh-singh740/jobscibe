@@ -15,7 +15,7 @@ const KeywordMatch = ({ parsedSkills = [] }) => {
       setLoading(true);
       setError("");
       const response = await axios.post(
-        "http://localhost:3000/api/ai/match",
+        "https://jobscibe.onrender.com//api/ai/match",
         { parsedSkills, jobDescription },
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
