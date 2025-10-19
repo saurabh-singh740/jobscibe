@@ -10,7 +10,12 @@ const skillsList = [
   "AWS","Azure","GCP","Docker","Kubernetes","Terraform","Ansible","Chef","Puppet","Jenkins","CircleCI","GitHub Actions","Linux","Nginx","Apache",
   "Machine Learning","Deep Learning","AI","TensorFlow","PyTorch","Scikit-learn","Keras","Pandas","NumPy","Matplotlib","Seaborn","OpenCV","NLP","HuggingFace","FastText","XGBoost","LightGBM","CatBoost",
   "JUnit","TestNG","Selenium","Cypress","Jest","Mocha","Chai","Playwright","PyTest","Karma","Enzyme","Mockito","Cucumber","Postman","SoapUI","LoadRunner","JMeter",
-  "Git","GitHub","GitLab","Bitbucket","SVN","Agile","Scrum","Kanban","JIRA","Trello","Asana","Figma","Wireframing","System Design",
+  "Git","GitHub","GitLab","Bitbucket","SVN","Agile","Scrum","Kanban","JIRA","Trello","Asana","Figma","Wireframing","System Design","MongoDB","framer motion",
+  "Pinecone",     
+  "Weaviate",      
+  "Milvus",        
+  "Qdrant",       
+  "FAISS" ,
   "VS Code","SQL"
 ];
 
@@ -49,108 +54,191 @@ function extractSkills(text) {
   const sectionMatch = text.match(skillsSectionRegex);
   let skillsText = sectionMatch ? sectionMatch[0] : text;
 
-  // Split by comma, slash, " / ", or capital letters followed by lowercase letters (for combined words)
+  // Split by comma, slash, bullets, multiple spaces
   let rawSkills = skillsText
-    .replace(/[-•]/g, " ") // remove bullets
-    .split(/[,\/]|(?=[A-Z][a-z]+)| {2,}/) 
+    .replace(/[-•]/g, " ")
+    .split(/[,\/]|(?=[A-Z][a-z]+)| {2,}/)
     .map(s => s.trim())
     .filter(Boolean);
 
-  const aliasMap = {
+
+ const aliasMap = {
   // Programming Languages
   "js": "JavaScript",
   "javascript": "JavaScript",
+  "typescript": "TypeScript",
   "ts": "TypeScript",
-  "nodejs": "Node.js",
-  "node": "Node.js",
+  "python": "Python",
   "py": "Python",
-  "csharp": "C#",
-  "c#": "C#",
-  "cpp": "C++",
+  "java": "Java",
+  "c": "C",
   "c++": "C++",
-  "vb": "VB.NET",
-  "vb.net": "VB.NET",
+  "cpp": "C++",
+  "c#": "C#",
+  "csharp": "C#",
+  "go": "Go",
+  "golang": "Go",
+  "rust": "Rust",
+  "ruby": "Ruby",
+  "kotlin": "Kotlin",
+  "swift": "Swift",
+  "php": "PHP",
+  "scala": "Scala",
+  "perl": "Perl",
   "r": "R",
   "matlab": "MATLAB",
-  "golang": "Go",
-  "php": "PHP",
-  "html": "HTML",
-  "css": "CSS",
-  "sql": "SQL",
+  "dart": "Dart",
+  "haskell": "Haskell",
+  "elixir": "Elixir",
+  "f#": "F#",
+  "lua": "Lua",
+  "julia": "Julia",
+  "shell": "Shell",
+  "bash": "Shell",
+  "powershell": "PowerShell",
+  "vb": "VB.NET",
+  "vb.net": "VB.NET",
 
-  // Frameworks / Libraries
+  // Frontend Frameworks / Libraries
+  "react.js": "React",
   "reactjs": "React",
   "react": "React",
+  "tailwind css": "Tailwind",
+  "tailwind": "Tailwind",
+  "framer motion": "Framer Motion",
   "reduxjs": "Redux",
-  "node.js": "Node.js",
-  "expressjs": "Express",
-  "nestjs": "NestJS",
-  "django": "Django",
-  "flask": "Flask",
-  "springboot": "Spring Boot",
-  "spring": "Spring",
-  "fastapi": "FastAPI",
-  "laravel": "Laravel",
-  "rails": "Rails",
-  "asp.net": "ASP.NET",
+  "redux": "Redux",
+  "next": "Next.js",
+  "next.js": "Next.js",
   "vue": "Vue.js",
+  "vuejs": "Vue.js",
   "angularjs": "Angular",
   "angular": "Angular",
   "svelte": "Svelte",
+  "ember": "Ember.js",
+  "emberjs": "Ember.js",
+  "backbone": "Backbone.js",
+  "backbonejs": "Backbone.js",
+  "jquery": "jQuery",
+  "bootstrap": "Bootstrap",
+  "tailwind": "Tailwind",
+  "material ui": "Material UI",
+  "mui": "Material UI",
+  "chakra": "Chakra UI",
+  "chakra ui": "Chakra UI",
+  "ant design": "Ant Design",
+  "sass": "Sass",
+  "scss": "Sass",
+  "less": "Less",
+  "css": "CSS",
+  "html": "HTML",
   "react native": "React Native",
+  "rn": "React Native",
   "flutter": "Flutter",
   "swiftui": "SwiftUI",
   "jetpack compose": "Jetpack Compose",
 
-  // Tools / Platforms
-  "vs code": "VS Code",
-  "vscode": "VS Code",
-  "git": "Git",
-  "github": "GitHub",
-  "gitlab": "GitLab",
-  "bitbucket": "Bitbucket",
-  "sql server": "SQL Server",
+  // Backend / Fullstack
+  "nodejs": "Node.js",
+  "node": "Node.js",
+  "node.js": "Node.js",
+  "expressjs": "Express",
+  "express": "Express",
+  "nestjs": "NestJS",
+  "django": "Django",
+  "flask": "Flask",
+  "spring": "Spring",
+  "springboot": "Spring Boot",
+  "spring boot": "Spring Boot",
+  "fastapi": "FastAPI",
+  "laravel": "Laravel",
+  "rails": "Rails",
+  "ruby on rails": "Rails",
+  "asp.net": "ASP.NET",
+  "graphql": "GraphQL",
+  "rest": "REST API",
+  "rest api": "REST API",
+  "socket.io": "Socket.IO",
+  "microservices": "Microservices",
+  "serverless": "Serverless",
+  "firebase functions": "Firebase Functions",
+  "aws lambda": "AWS Lambda",
+
+  // Databases
+  "mysql": "MySQL",
   "postgres": "PostgreSQL",
   "postgresql": "PostgreSQL",
-  "mysql": "MySQL",
+  "sql server": "SQL Server",
+  "sqlite": "SQLite",
   "mongodb": "MongoDB",
   "redis": "Redis",
   "cassandra": "Cassandra",
   "oracle": "OracleDB",
+  "oracle db": "OracleDB",
   "mariadb": "MariaDB",
   "dynamodb": "DynamoDB",
   "neo4j": "Neo4j",
   "elasticsearch": "ElasticSearch",
   "influxdb": "InfluxDB",
   "firebase": "Firebase Firestore",
+  "firebase firestore": "Firebase Firestore",
+  "firebase realtime db": "Firebase Realtime DB",
+  "cockroachdb": "CockroachDB",
+  "bigquery": "BigQuery",
+   "pinecone": "Pinecone",
+  "weaviate": "Weaviate",
+  "milvus": "Milvus",
+  "qdrant": "Qdrant",
+  "faiss": "FAISS",
 
-  // UI / CSS / Frontend
-  "mui": "Material UI",
-  "chakra": "Chakra UI",
-  "ant design": "Ant Design",
-  "bootstrap": "Bootstrap",
-  "tailwind": "Tailwind",
-  "sass": "Sass",
-  "less": "Less",
+  // Cloud / DevOps
+  "aws": "AWS",
+  "amazon web services": "AWS",
+  "azure": "Azure",
+  "gcp": "GCP",
+  "google cloud": "GCP",
+  "docker": "Docker",
+  "k8s": "Kubernetes",
+  "kubernetes": "Kubernetes",
+  "terraform": "Terraform",
+  "ansible": "Ansible",
+  "chef": "Chef",
+  "puppet": "Puppet",
+  "jenkins": "Jenkins",
+  "circleci": "CircleCI",
+  "github actions": "GitHub Actions",
+  "linux": "Linux",
+  "nginx": "Nginx",
+  "apache": "Apache",
 
-  // AI / ML / Data
+  // AI / ML / Data Science
+  "machine learning": "Machine Learning",
+  "ml": "Machine Learning",
+  "deep learning": "Deep Learning",
+  "ai": "AI",
   "tensorflow": "TensorFlow",
+  "tf": "TensorFlow",
   "pytorch": "PyTorch",
-  "scikit": "Scikit-learn",
+  "torch": "PyTorch",
   "scikit-learn": "Scikit-learn",
+  "sklearn": "Scikit-learn",
   "keras": "Keras",
   "pandas": "Pandas",
   "numpy": "NumPy",
+  "np": "NumPy",
   "matplotlib": "Matplotlib",
+  "plt": "Matplotlib",
   "seaborn": "Seaborn",
   "opencv": "OpenCV",
+  "cv2": "OpenCV",
   "nlp": "NLP",
   "huggingface": "HuggingFace",
   "xgboost": "XGBoost",
   "lightgbm": "LightGBM",
   "catboost": "CatBoost",
+  "fasttext": "FastText",
 
-  // Testing
+  // Testing / QA
   "junit": "JUnit",
   "testng": "TestNG",
   "selenium": "Selenium",
@@ -169,7 +257,12 @@ function extractSkills(text) {
   "loadrunner": "LoadRunner",
   "jmeter": "JMeter",
 
-  // Others
+  // Project management / Tools
+  "git": "Git",
+  "github": "GitHub",
+  "gitlab": "GitLab",
+  "bitbucket": "Bitbucket",
+  "svn": "SVN",
   "agile": "Agile",
   "scrum": "Scrum",
   "kanban": "Kanban",
@@ -179,29 +272,18 @@ function extractSkills(text) {
   "figma": "Figma",
   "wireframing": "Wireframing",
   "system design": "System Design",
-  "aws": "AWS",
-  "azure": "Azure",
-  "gcp": "GCP",
-  "docker": "Docker",
-  "k8s": "Kubernetes",
-  "kubernetes": "Kubernetes",
-  "terraform": "Terraform",
-  "ansible": "Ansible",
-  "chef": "Chef",
-  "puppet": "Puppet",
-  "jenkins": "Jenkins",
-  "circleci": "CircleCI"
+  "vs code": "VS Code",
+  "vscode": "VS Code",
+  "sql": "SQL"
 };
 
 
-  const normalized = [...new Set(
+ const normalized = [...new Set(
     rawSkills.map(s => aliasMap[s.toLowerCase()] || s)
   )];
 
-  // Filter against master list case-insensitively
   return normalized.filter(skill => skillsList.some(master => master.toLowerCase() === skill.toLowerCase()));
 }
-
 
 
 // ---------------- Parser ---------------- //

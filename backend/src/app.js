@@ -6,9 +6,11 @@ const jobRoutes = require("./routes/job.routes");
 const aiRoutes = require("./routes/ai.routes");
 const cors = require("cors");
 const app = express();
+
+
 app.use(cors({
-  origin: "http://localhost:5173", // frontend ka URL
-  credentials: true, // cookies allow karne ke liye
+  origin: "http://localhost:5173",
+  credentials: true,
 }));
 
 

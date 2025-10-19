@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import { motion } from "framer-motion";
 
 function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -10,16 +11,17 @@ function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ Check if token is valid
   const isTokenValid = (token) => {
     try {
       const decoded = jwtDecode(token);
-      if (!decoded.exp) return false;
       return decoded.exp > Date.now() / 1000;
     } catch {
       return false;
     }
   };
 
+  // ✅ On component mount, check token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token && isTokenValid(token)) {
@@ -30,11 +32,12 @@ function Login() {
     }
   }, []);
 
+  // ✅ Axios interceptor for session expiry
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (res) => res,
       (err) => {
-        if (err.response && err.response.status === 401) {
+        if (err.response?.status === 401) {
           localStorage.removeItem("token");
           setIsLoggedIn(false);
           setError("⚠️ Session expired. Please login again.");
@@ -42,7 +45,6 @@ function Login() {
         return Promise.reject(err);
       }
     );
-
     return () => axios.interceptors.response.eject(interceptor);
   }, []);
 
@@ -51,18 +53,17 @@ function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Login handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const res = await axios.post(
         "http://localhost:3000/api/auth/login",
         { email: formData.email, password: formData.password },
         { withCredentials: true }
       );
-
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         setIsLoggedIn(true);
@@ -75,95 +76,115 @@ function Login() {
     }
   };
 
+  // ✅ Logout handler
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
+    setFormData({ email: "", password: "" });
     navigate("/");
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 overflow-hidden px-4">
-      {/* 🔥 Animated gradient blobs in background */}
-      <div className="absolute -top-20 -left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float-slow"></div>
-      <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
-      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float-reverse"></div>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364] text-gray-100">
+      {/* Floating gradient orbs */}
+      <div className="absolute top-[-10rem] left-[-5rem] w-80 h-80 bg-indigo-500/40 rounded-full blur-[100px] animate-[float_8s_ease-in-out_infinite]"></div>
+      <div className="absolute bottom-[-10rem] right-[-5rem] w-96 h-96 bg-pink-500/40 rounded-full blur-[120px] animate-[float-rev_10s_ease-in-out_infinite]"></div>
 
-      {/* 🔥 Animated login card */}
-      <div className="w-full max-w-md bg-white shadow-2xl rounded-3xl p-8 sm:p-10 relative z-10 transform transition-all duration-700 ease-out animate-fade-in-up">
-        <h2 className="text-center text-3xl font-extrabold text-purple-700 mb-6">
-          Jobscribe Login
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-md relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-[0_0_40px_rgba(99,102,241,0.3)] p-8 sm:p-10"
+      >
+        <h2 className="text-center text-3xl font-extrabold bg-gradient-to-r from-indigo-400 to-pink-500 bg-clip-text text-transparent mb-8">
+          Welcome Back to JobScribe
         </h2>
 
         {isLoggedIn ? (
           <div className="space-y-6">
-            <p className="text-center text-green-600 font-medium">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center text-green-400 bg-green-900/30 p-2 rounded-md font-medium"
+            >
               ✅ You are logged in
-            </p>
-            <button
+            </motion.p>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
               onClick={handleLogout}
-              className="w-full py-3 bg-red-500 text-white font-semibold rounded-xl shadow-lg hover:bg-red-600 transition"
+              className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md hover:shadow-lg transition-all"
             >
               Logout
-            </button>
+            </motion.button>
           </div>
         ) : (
-          <>
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="relative">
-                <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-purple-600">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-purple-400 outline-none transition"
-                  placeholder="your@email.com"
-                />
-              </div>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Email */}
+            <div className="relative">
+              <label className="absolute -top-3 left-3 text-sm font-medium text-indigo-300 bg-transparent">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+                placeholder="your@email.com"
+              />
+            </div>
 
-              <div className="relative">
-                <label className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-purple-600">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  minLength="6"
-                  className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-purple-400 outline-none transition"
-                  placeholder="••••••••"
-                />
-              </div>
+            {/* Password */}
+            <div className="relative">
+              <label className="absolute -top-3 left-3 text-sm font-medium text-indigo-300 bg-transparent">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+                className="w-full rounded-xl bg-white/5 border border-white/20 px-4 py-3 text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+                placeholder="••••••••"
+              />
+            </div>
 
-              {error && (
-                <p className="text-sm text-red-600 bg-red-100 p-2 rounded-md animate-pulse">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:from-purple-700 hover:to-pink-700 transition transform hover:scale-105"
+            {/* Error */}
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-red-400 bg-red-900/30 p-2 rounded-md"
               >
-                {loading ? "Logging in..." : "Login"}
-              </button>
-            </form>
+                {error}
+              </motion.p>
+            )}
 
-            <p className="mt-6 text-center text-sm text-gray-600">
+            {/* Login Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }}
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-md hover:shadow-lg transition-all"
+            >
+              {loading ? "Logging in..." : "Login"}
+            </motion.button>
+
+            {/* Footer */}
+            <p className="mt-6 text-center text-sm text-gray-300">
               Don’t have an account?{" "}
-              <Link to="/register" className="text-purple-600 font-medium">
+              <Link to="/register" className="text-indigo-400 font-medium hover:underline">
                 Register
               </Link>
             </p>
-          </>
+          </form>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

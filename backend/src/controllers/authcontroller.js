@@ -17,6 +17,7 @@ const registerUser = async (req, res) => {
   
   try {
     const { name, email, password } = req.body;
+    
 
     // Check existing user
     if (await User.findOne({ email })) {
@@ -32,6 +33,8 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
     });
+    
+
     const token=jwt.sign({id:user._id},process.env.JWT_SECRET)
     res.cookie("token",token)
 
@@ -54,6 +57,7 @@ const loginUser = async (req, res) => {
     // Check user
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid Credentials" });
+  
 
     // Compare password
     const validPassword = await bcrypt.compare(password, user.password);

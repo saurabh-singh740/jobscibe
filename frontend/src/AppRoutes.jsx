@@ -13,7 +13,7 @@ function AppRoutes() {
     <BrowserRouter>
       {/* Navbar har page pe visible */}
       <Navbar />
-      <div className="pt-20">
+      <div>
         {/* Routes */}
         <Routes>
           <Route path="/" element={<Home />} />
