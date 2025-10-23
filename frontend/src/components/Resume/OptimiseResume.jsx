@@ -23,7 +23,7 @@ const OptimiseResume = ({ resumeId, parsedSkills }) => {
       setError("");
 
       const response = await axios.post(
-        "https://jobscibe.onrender.com//api/ai/optimize",
+        "https://jobscibe.onrender.com/api/ai/optimize",
         { resumeId, parsedSkills, jobDescription },
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
