@@ -1,3 +1,4 @@
+Live Link=https://jobscibe.onrender.com/
 JobScibe
 
 JobScibe is a modern, AI-powered platform designed to help job seekers streamline their application process. It allows users to upload and optimise resumes, match keywords with job descriptions, and apply to jobs directly through the integrated Jobble API. The platform also includes an interactive About and Contact page, making it fully professional and responsive.
