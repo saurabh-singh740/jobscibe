@@ -69,7 +69,7 @@ const OptimiseResume = ({ resumeId, parsedSkills }) => {
       <textarea
         value={jobDescription}
         onChange={(e) => setJobDescription(e.target.value)}
-        placeholder="Paste job description here..."
+        placeholder="Paste job description here you want to optimised for (MERN,Frontend,Fullstack,etc..)"
         className="w-full h-28 p-3 mb-3 rounded-md text-gray-100 bg-[#203a43]/50 focus:outline-none focus:ring-2 focus:ring-white resize-none"
       />
 
