@@ -34,7 +34,7 @@ function Register() {
 
     try {
       const res = await axios.post(
-        "https://jobscibe.onrender.comapi/auth/register",
+        "https://jobscibe.onrender.com/api/auth/register",
         {
           name: formData.name,
           email: formData.email,

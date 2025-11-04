@@ -60,7 +60,7 @@ function Login() {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://jobscibe.onrender.comapi/auth/login",
+        "https://jobscibe.onrender.com/api/auth/login",
         { email: formData.email, password: formData.password },
         { withCredentials: true }
       );
