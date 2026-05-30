@@ -58,7 +58,7 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        "https://jobscibe.onrender.com/api/auth/login",
         { email: formData.email, password: formData.password },
         { withCredentials: true }
       );
